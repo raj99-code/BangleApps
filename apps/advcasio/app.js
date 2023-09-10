@@ -29,6 +29,8 @@ function getRocketSequences() {
   };
 }
 
+
+var tempe = "?";
 let rocketSequence = 1;
 let settings = storage.readJSON("cassioWatch.settings.json", true) || {};
 let rocketSpeed = settings.rocketSpeed || 700;
@@ -93,15 +95,18 @@ function getTemperature(){
     return Math.round(weather.temp-273.15);
 
   } catch(ex) {
-    print(ex)
-    return "?"
+    Bangle.getPressure().then(pressure => {
+      tempe = Math.round(pressure.temperature) + ".";
+    });
+    print(ex);
+    return tempe;
   }
 }
 
 function getSteps() {
   var steps = Bangle.getHealthStatus("day").steps;
-  steps = Math.round(steps/1000);
-  return steps + "k";
+  steps = Math.floor(steps/100)/10;
+  return " " + steps;
 }
 
 
@@ -123,7 +128,10 @@ function draw() {
   g.setFont("8x12", 2);
   g.drawString(getTemperature(), 155, 132);
   g.drawString(Math.round(Bangle.getHealthStatus().bpm||Bangle.getHealthStatus("last").bpm), 109, 98);
-  g.drawString(getSteps(), 158, 98);
+  g.setFont("8x12", 2);
+  g.drawString(getSteps(), 153, 98);
+  g.setFont("6x12", 0.5);
+  g.drawString("k", 173, 110);
 
   g.setFontAlign(-1,-1);
   drawClock();
